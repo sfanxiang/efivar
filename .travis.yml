@@ -1,7 +1,7 @@
 sudo: required
 language: c
 install: true
-script: make mkvars all
+script: make all
 
 matrix:
   include:
