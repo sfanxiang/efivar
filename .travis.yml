@@ -21,6 +21,7 @@ matrix:
         - sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
         - sudo apt-get update -qq
         - sudo apt-get install gcc-4.9 binutils
+        - test -n $CC && unset CC
     - compiler: gcc
       env:
         - COMPILER=gcc-5
@@ -31,29 +32,34 @@ matrix:
           sources:
             - ubuntu-toolchain-r-test
           packages:
-            - gcc-4.9
+            - gcc-5
             - binutils
       before_install:
         - sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
         - sudo apt-get update -qq
         - sudo apt-get install gcc-5 binutils
+        - test -n $CC && unset CC
     - compiler: gcc
-      before_install:
-        - sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
-        - sudo apt-get update -qq
-        - sudo apt-get install gcc-6 binutils
+      env:
+        - COMPILER=gcc-6
+        - CROSS_COMPILE=x86_64-linux-gnu-
       dist: xenial
       addons:
         apt:
           sources:
             - ubuntu-toolchain-r-test
           packages:
-            - gcc-4.9
+            - gcc-6
             - binutils
-      env:
-        - COMPILER=gcc-6
-        - CROSS_COMPILE=x86_64-linux-gnu-
+      before_install:
+        - sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
+        - sudo apt-get update -qq
+        - sudo apt-get install gcc-6 binutils
+        - test -n $CC && unset CC
 #    - compiler: gcc
+#      env:
+#        - COMPILER=gcc-7
+#        - CROSS_COMPILE=x86_64-linux-gnu-
 #      dist: zesty
 #      addons:
 #        apt:
@@ -62,13 +68,11 @@ matrix:
 #          packages:
 #            - gcc-7
 #            - binutils
-#      env:
-#        - COMPILER=gcc-7
-#        - CROSS_COMPILE=x86_64-linux-gnu-
 #      before_install:
 #        - sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
 #        - sudo apt-get update -qq
 #        - sudo apt-get install gcc-7 binutils
+#        - test -n $CC && unset CC
 #    - compiler: clang
 #      env: COMPILER=clang-3.6
 #      before_install:
