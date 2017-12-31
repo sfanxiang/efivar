@@ -208,12 +208,17 @@ static inline int
 __attribute__((unused))
 get_sector_size(int filedes)
 {
-	int rc, sector_size = 512;
+	int sector_size = 512;
+#ifndef __HAIKU__
+	int rc;
 
-	rc = ioctl(filedes, "BLKSSZGET", &sector_size);
+	rc = ioctl(filedes, BLKSSZGET, &sector_size);
 	if (rc)
 		sector_size = 512;
 	return sector_size;
+#else
+	return sector_size;
+#endif
 }
 
 #define asprintfa(str, fmt, args...)					\

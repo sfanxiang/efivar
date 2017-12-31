@@ -21,6 +21,7 @@
 #define EFIVAR_H 1
 
 #include <endian.h>
+#include <err.h>
 #include <errno.h>
 #include <stdarg.h>
 #include <stdint.h>
