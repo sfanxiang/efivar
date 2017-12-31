@@ -217,6 +217,7 @@ get_sector_size(int filedes)
 		sector_size = 512;
 	return sector_size;
 #else
+	(void)(filedes);
 	return sector_size;
 #endif
 }

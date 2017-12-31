@@ -31,14 +31,87 @@
 #include <unistd.h>
 
 #ifndef __HAIKU__
+
 #include <byteswap.h>
+
 #else
+
+#include <stdio.h>
+#include <stdlib.h>
+
 #define bswap_16(x) __builtin_bswap16(x)
 #define bswap_32(x) __builtin_bswap32(x)
 #define bswap_64(x) __builtin_bswap64(x)
 #define __bswap_16(x) bswap_16(x)
 #define __bswap_32(x) bswap_32(x)
 #define __bswap_64(x) bswap_64(x)
+
+extern char *__progname;
+
+inline void vwarn(const char *fmt, va_list args)
+{
+	fputs(__progname, stderr);
+	if (fmt != NULL)
+	{
+		fputs(": ", stderr);
+		vfprintf(stderr, fmt, args);
+	}
+	fputs(": ", stderr);
+	fputs(strerror(errno), stderr);
+	putc('\n', stderr);
+}
+
+inline void vwarnx(const char *fmt, va_list args)
+{
+	fputs(__progname, stderr);
+	fputs(": ", stderr);
+	if (fmt != NULL)
+		vfprintf(stderr, fmt, args);
+	putc('\n', stderr);
+}
+
+inline void verr(int eval, const char *fmt, va_list args)
+{
+	vwarn(fmt, args);
+	exit(eval);
+}
+
+inline void verrx(int eval, const char *fmt, va_list args)
+{
+	vwarnx(fmt, args);
+	exit(eval);
+}
+
+inline void warn(const char *fmt, ...)
+{
+	va_list argptr;
+	va_start(argptr, fmt);
+	vwarn(fmt, argptr);
+	va_end(argptr);
+}
+
+inline void warnx(const char *fmt, ...)
+{
+	va_list argptr;
+	va_start(argptr, fmt);
+	vwarnx(fmt, argptr);
+	va_end(argptr);
+}
+
+inline void err(int eval, const char *fmt, ...)
+{
+	va_list argptr;
+	va_start(argptr, fmt);
+	verr(eval, fmt, argptr);
+}
+
+inline void errx(int eval, const char *fmt, ...)
+{
+	va_list argptr;
+	va_start(argptr, fmt);
+	verrx(eval, fmt, argptr);
+}
+
 #endif
 
 typedef struct {
