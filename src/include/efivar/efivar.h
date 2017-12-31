@@ -28,7 +28,14 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
+
+#ifndef __HAIKU__
 #include <byteswap.h>
+#else
+#define bswap_16(x) __builtin_bswap16(x)
+#define bswap_32(x) __builtin_bswap32(x)
+#define bswap_64(x) __builtin_bswap64(x)
+#endif
 
 typedef struct {
 	uint32_t	a;
