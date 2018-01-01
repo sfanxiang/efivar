@@ -28,6 +28,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/ioctl.h>
+#ifndef __HAIKU__
+#include <sys/mount.h>
+#endif
 #include <tgmath.h>
 #include <unistd.h>
 
