@@ -20,22 +20,19 @@
 
 #include <errno.h>
 #include <fcntl.h>
-#include <linux/magic.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/mman.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/statvfs.h>
 #include <sys/uio.h>
-#include <sys/vfs.h>
 #include <unistd.h>
 
 #include "lib.h"
 #include "generics.h"
 #include "util.h"
-
-#include <linux/fs.h>
 
 #ifndef EFIVARFS_MAGIC
 #  define EFIVARFS_MAGIC 0xde5e81e4
@@ -63,23 +60,13 @@ efivarfs_probe(void)
 
 	if (!access(path, F_OK)) {
 		int rc = 0;
-		struct statfs buf;
+		struct statvfs buf;
 
 		memset(&buf, '\0', sizeof (buf));
-		rc = statfs(path, &buf);
+		rc = statvfs(path, &buf);
 		if (rc == 0) {
-			char *tmp;
-			__typeof__(buf.f_type) magic = EFIVARFS_MAGIC;
-			if (!memcmp(&buf.f_type, &magic, sizeof (magic)))
-				return 1;
-			else
-				efi_error("bad fs type for %s", path);
-
-			tmp = getenv("EFIVARFS_PATH");
-			if (tmp && !strcmp(tmp, path)) {
-				efi_error_clear();
-				return 1;
-			}
+			/* getting fs type is not supported in Haiku */
+			return 1;
 		} else {
 			efi_error("statfs(%s) failed", path);
 		}
@@ -101,28 +88,10 @@ efivarfs_probe(void)
 static int
 efivarfs_set_fd_immutable(int fd, int immutable)
 {
-	unsigned int flags;
-	int rc = 0;
-
-	rc = ioctl(fd, FS_IOC_GETFLAGS, &flags);
-	if (rc < 0) {
-		if (errno == ENOTTY)
-			rc = 0;
-		else
-			efi_error("ioctl(%d, FS_IOC_GETFLAGS) failed", fd);
-	} else if ((immutable && !(flags & FS_IMMUTABLE_FL)) ||
-		   (!immutable && (flags & FS_IMMUTABLE_FL))) {
-		if (immutable)
-			flags |= FS_IMMUTABLE_FL;
-		else
-			flags &= ~FS_IMMUTABLE_FL;
-
-		rc = ioctl(fd, FS_IOC_SETFLAGS, &flags);
-		if (rc < 0)
-			efi_error("ioctl(%d, FS_IOC_SETFLAGS) failed", fd);
-	}
-
-	return rc;
+	/* setting fd immutable is not supported in Haiku */
+	(void)(fd);
+	(void)(immutable);
+	return 0;
 }
 
 static int
